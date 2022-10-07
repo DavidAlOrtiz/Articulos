@@ -11,22 +11,18 @@ function App() {
   }, []);
 
   const datos = async () => {
-    const respuesta = await axios(`https://jsonplaceholder.typicode.com/users`);
 
-    // const respuestaArticulos = await fetch('http://192.168.43.114:8080/articulo/');
-    // const respuestaData = await respuestaArticulos.json();
-    // console.log(respuestaData)
-
+    const respuestaArticulos = await axios('http://192.168.43.114:8080/articulo');
     // await fetch(`https://jsonplaceholder.typicode.com/users`);
     // const datos = await respuesta.json()
 
-    setLista(respuesta.data);
+    setLista(respuestaArticulos.data._embedded.articuloes);
   };
 
   return (
     <>
       <HeaderForm></HeaderForm>
-      <h1 className="text-center mb-5">Lista de usuarios conaxios</h1>
+      <h1 className="text-center mb-5">Lista de Articulos</h1>
       <div className="container">
         <div className="row">
           {lista.map((item, index) => (
@@ -39,15 +35,14 @@ function App() {
                     alt=""
                   />
                   <div className="card-body">
-                    <h5 className="card-title">{item.name}</h5>
+                    <h5 className="card-title">{item.codInterno}</h5>
                     <p className="card-text">
-                      Some quick example text to build on the card title and
-                      make up the bulk of the card's content.
+                      <strong> {item.descripcion}</strong>
                     </p>
                     <p>
-                      <strong>Precio:</strong> $700.60
+                      <strong>Precio:</strong> ${item.precioCompra}
                     </p>
-                    <a href="#" className="btn btn-outline-primary w-75"> 
+                    <a href="#" className="btn btn-outline-primary w-75">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
