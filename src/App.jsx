@@ -3,61 +3,86 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { HeaderForm } from "./components/header.articulo";
 
-
 function App() {
-  //useState para la api 
+  //useState para la apib
   const [lista, setLista] = useState([]);
   //useState para la cantidad seleccionada
-  const [cantidad, setCantidad] = useState(0);
+  const [cantidad, setCantidad] = useState(1);
 
   //useState para localStorage item y objeto
   const [objetoCarro, setObjetoCarro] = useState({});
   const [objetosCarro, setObjetosCaro] = useState([]);
 
-  //LocalStorage Variable 
+  //LocalStorage Variable
   const [local, setLocal] = useState([]);
+  const [datosA, setDatosA] = useState([]);
 
 
   useEffect(() => {
     datos();
-    
+    if (localStorage.length == 0){
+      localStorage.setItem("carrito", JSON.stringify(objetosCarro));
+    }else{
+      setObjetosCaro(JSON.parse(localStorage.getItem("carrito")));
+    }
   }, []);
 
   //Consulta Appi
   const datos = async () => {
-    const respuestaArticulos = await axios(
-      "http://192.168.43.83:8080/articulo"
-    );
-    setLista(respuestaArticulos.data._embedded.articuloes);
+    // const respuestaArticulos = await axios(
+    //   "http://192.168.43.83:8080/articulo"
+    // );
+    // setLista(respuestaArticulos.data._embedded.articuloes);
+    setLista([
+      {
+        codInterno: 1,
+        descripcion: "Coca de chescos",
+        precioCompra: 790,
+      },
+    ]);
+    const datos = localStorage.getItem("carrito");
+    const datosA = JSON.parse(datos);
+
   };
 
-
   //Valor de la cantidad deseada por el usuario
-  const handleChange = ({target}) => {
+  const handleChange = ({ target }) => {
     setCantidad(target.value);
-  }
+  };
 
   //Guardar en localStorage
   const guardarLocal = async (e, item) => {
-    item.cantidad = cantidad
-    objetosCarro.push(item)
-    localStorage.setItem('carrito', JSON.stringify(objetosCarro));
-    get()
+    item.cantidad = cantidad;
+    objetosCarro.push(item);
+    console.log(objetosCarro)
     
-  }
+    //
+    let datos = 0;
+    objetosCarro.map(p => {
+      if(p.codInterno == item.codInterno){
+        datos += Number(p.cantidad);
+        console.log(datos)
+      }
+      
+    });
+    console.log(objetosCarro)
+
+    datosA.push(JSON.stringify(item));
+    localStorage.setItem("carrito", JSON.stringify(objetosCarro));
+
+    get();
+  };
 
   //Consultar localStorage
-  const get = () =>{
+  const get = () => {
     const datos = localStorage.getItem("carrito");
-    const datosA  = JSON.parse(datos);
+    const datosA = JSON.parse(datos);
     // datosA.forEach(element => {
     //   local.push(element)
     // });
     // console.log(local)
-    setLocal(datosA)
-    console.log(local)
-  }
-
+    setLocal(datosA);
+  };
 
   return (
     <>
@@ -65,7 +90,7 @@ function App() {
       <h1 className="text-center mb-5">Lista de Articulos</h1>
       <div className="container">
         <div className="row">
-          { lista.map((item, index) => (
+          {lista.map((item, index) => (
             <>
               <div className="col-md-4 mb-4">
                 <div className="card">
@@ -83,30 +108,24 @@ function App() {
                       <strong>Precio:</strong> ${item.precioCompra}
                     </p>
                     <div className="row mb-3">
-                    
                       <div className="col-md-4">
-                        <select
-                          class="form-select w-100"
-                          aria-label="Default select example"
+                        <input
+                          type="number"
+                          class="form-control w-100"
+                          id="tentacles"
                           onChange={handleChange}
                           value={cantidad}
                           required
-                        >
-                          {/* <option >-</option> */}
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                          <option value="4">4</option>
-                          <option value="5">5</option>
-                          <option value="6">6</option>
-                          <option value="7">7</option>
-                          <option value="8">8</option>
-                          <option value="9">9</option>
-                          <option value="10">10</option>
-                        </select>
+                          min="1"
+                          max="10"
+                        />
                       </div>
                       <div className="col-md-8">
-                        <button href="#" className="btn btn-outline-primary w-100"  onClick={((e) => guardarLocal(e, item))}>
+                        <button
+                          href="#"
+                          className="btn btn-outline-primary w-100"
+                          onClick={(e) => guardarLocal(e, item)}
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="16"
@@ -123,9 +142,6 @@ function App() {
                         </button>
                       </div>
                     </div>
-                   
-
-                   
 
                     <a href="#" className="btn btn-outline-danger w-100">
                       <svg
@@ -145,16 +161,14 @@ function App() {
                   </div>
                 </div>
               </div>
-              
-              
             </>
           ))}
         </div>
       </div>
       <h1>Carrito</h1>
-      {local.map((item, index) =>{
+      {/* {local.map((item, index) =>{
         <h1>{item.descripcion}</h1>
-      })}
+      })} */}
     </>
   );
 }
